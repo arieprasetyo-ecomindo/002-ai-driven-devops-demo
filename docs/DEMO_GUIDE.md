@@ -5,30 +5,15 @@ A comprehensive guide for presenters to demonstrate all features using this Vue.
 ## Demo Overview
 This guide walks you through 10 key demonstrations of GitHub's AI-driven DevOps features using the included Vue.js application that displays random pictures and quotes. The app is intentionally created with security vulnerabilities to showcase GitHub's detection and remediation capabilities.
 
----
-
-## Demo Item 1: VSCode Commit Message Generation
-
-**Objective**: Show how GitHub Copilot generates commit messages automatically.
-
-### Steps:
-1. Start the dev server: `npm run dev` in the `app/` directory
-2. Make a small code change (e.g., update a comment or add a variable in `src/App.vue`). Or a medium one, eg. add a countdown timer until next image/quote.
-3. Go to VS Code Source Control (Ctrl+Shift+G / Cmd+Shift+G)
-4. Stage the changes
-5. Open the Commit Input box
-6. With Copilot extension enabled, you should see a "✨" button to generate a commit message
-7. Click the button and Copilot will suggest a descriptive commit message based on your changes
-8. Review and confirm the message
-
-**Talking Points**:
-- Copilot understands your code changes and generates contextual commit messages
-- Uses component-level context (Vue setup, API calls, etc.)
-- Saves time and ensures consistency in commit messages
+## Appendix Index
+- Native Git pre-push hook: [appendix/git-hooks-pre-push.md](appendix/git-hooks-pre-push.md)
+- Manual vulnerable demo snippet: [appendix/vulnerability-demo-snippet.md](appendix/vulnerability-demo-snippet.md)
+- Security scanning workflow: [appendix/security-workflow.md](appendix/security-workflow.md)
+- CodeQL workflow: [appendix/codeql-workflow.md](appendix/codeql-workflow.md)
 
 ---
 
-## Demo Item 2: Copilot Instructions Checklist
+## Demo Item 1: Copilot Instructions Checklist
 
 **Objective**: Demonstrate the `.copilot-instructions.md` file and how it guides AI assistants.
 
@@ -47,58 +32,71 @@ This guide walks you through 10 key demonstrations of GitHub's AI-driven DevOps 
 
 ---
 
-## Demo Item 3: Git Hooks
+## Demo Item 2: Git Hooks
 
-**Objective**: Demonstrate local git hooks that run before commits.
+**Objective**: Demonstrate native Git hooks that run before push while making a small UI change.
 
 ### Steps:
-1. Create a `.husky/` directory in the `app/` folder (or demonstrate if already present)
-2. Show pre-commit hooks that run linting/formatting:
+1. Show the native hook script in `.githooks/pre-push`
+2. Configure local hooks path once:
    ```bash
-   mkdir -p app/.husky
+   git config core.hooksPath .githooks
    ```
-3. Create a pre-commit hook:
+3. Make a small UI change in `app/src/App.vue` (example: add a timer for next slide change)
+4. Stage and commit the UI change
+5. Confirm unit tests run before push:
    ```bash
-   cat > app/.husky/pre-commit << 'EOF'
-   #!/bin/sh
-   echo "Running pre-commit checks..."
-   npm run lint
-   EOF
-   chmod +x app/.husky/pre-commit
+   git push
    ```
-4. Attempt to commit with linting errors to show the hook executes
-5. Explain how this prevents bad code from being committed
+6. Demonstrate a failing test blocks push, then fix test and push again
+7. Refer to [appendix/git-hooks-pre-push.md](appendix/git-hooks-pre-push.md)
 
 **Talking Points**:
 - Git hooks run automatically on developer machines
 - Catch issues early before code reaches the repository
-- Examples: linting, formatting, security checks
+- Works naturally with everyday changes like a small UI update
+- Example here: pre-push runs all unit tests (`npm run test:unit`)
 - Saves time by preventing CI/CD failures
 
 ---
 
-## Demo Item 4: Committing Hard-Coded Keys (Security Anti-Pattern)
+## Demo Item 3: Committing Hard-Coded Keys (Security Anti-Pattern)
 
 **Objective**: Show the security vulnerability of hard-coded credentials.
 
 ### Steps:
-1. Open `src/config.js` in VS Code
-2. Point out the hard-coded API keys:
-   - AWS Access Key
-   - AWS Secret Key
-   - Database Password
-   - GitHub Token
-3. Explain why this is dangerous:
+1. Open [appendix/vulnerability-demo-snippet.md](appendix/vulnerability-demo-snippet.md)
+2. Copy the snippet into `app/src/config.js` manually during the demo
+3. Explain why hard-coded credentials are dangerous:
    - Anyone with repository access can see credentials
    - Credentials in git history are permanent and recoverable
    - Risk of unauthorized access to services
-4. This file is intentionally included to demonstrate what GitHub's tools detect
+4. Commit intentionally in a demo branch only, then show how scanning tools detect it
 
 **Talking Points**:
 - Hard-coded secrets are a critical security risk
 - Once committed, they remain in git history even if deleted
-- GitHub Actions and CodeQL will flag these in subsequent demos
+- GitHub Actions and CodeQL can flag these in subsequent demos
 - Best practice: Use environment variables and GitHub Secrets
+
+---
+
+## Demo Item 4: VSCode Commit Message Generation
+
+**Objective**: Show how GitHub Copilot generates commit messages automatically.
+
+### Steps:
+1. Reuse the latest change you just made (for example, the UI timer change from Demo Item 2)
+2. Go to VS Code Source Control (Ctrl+Shift+G / Cmd+Shift+G)
+3. Stage the changes
+4. Open the Commit Input box
+5. With Copilot extension enabled, use the "✨" button to generate a commit message
+6. Review and confirm the message
+
+**Talking Points**:
+- Copilot understands your code changes and generates contextual commit messages
+- Uses component-level context (Vue setup, API calls, etc.)
+- Saves time and ensures consistency in commit messages
 
 ---
 
@@ -107,12 +105,9 @@ This guide walks you through 10 key demonstrations of GitHub's AI-driven DevOps 
 **Objective**: Compare local checks (git hooks) vs. cloud-based checks (GitHub Actions).
 
 ### Steps:
-1. Show the git hook from Demo Item 3 (local machine)
-2. Create/show `.github/workflows/security.yml`:
-   ```bash
-   mkdir -p app/.github/workflows
-   ```
-3. Create a workflow file (see **Appendix: Example Workflow** below)
+1. Show the git hook from Demo Item 2 (local machine)
+2. Create/show `.github/workflows/security.yml`
+3. Use this appendix as the template: [appendix/security-workflow.md](appendix/security-workflow.md)
 4. Explain the differences:
    - Git Hooks: Run locally, fast feedback, developer-controlled
    - GitHub Actions: Run on every push/PR, enforced checks, audit trail
@@ -135,14 +130,15 @@ This guide walks you through 10 key demonstrations of GitHub's AI-driven DevOps 
 1. Go to your GitHub repository Settings
 2. Navigate to Security → Code Security and Analysis
 3. Enable CodeQL (if not already enabled)
-4. Create `.github/workflows/codeql-analysis.yml` (example in Appendix)
+4. Show that `.github/workflows/codeql.yml` is already present in the repository
 5. Push code changes to trigger CodeQL
 6. Wait for the scan to complete (usually 1-2 minutes)
 7. Go to Security tab → Code Scanning alerts
 8. Show the detected issues:
-   - Hard-coded secrets from `src/config.js`
-   - Potential SQL injection in `queryDatabase()` function
+   - Hard-coded secrets from the demo snippet, if intentionally added
+   - Potential SQL injection from the demo snippet function, if intentionally added
    - Any other vulnerabilities CodeQL finds
+9. Workflow reference: [appendix/codeql-workflow.md](appendix/codeql-workflow.md)
 
 **Talking Points**:
 - CodeQL performs semantic code analysis
@@ -210,7 +206,7 @@ This guide walks you through 10 key demonstrations of GitHub's AI-driven DevOps 
    The application contains hard-coded secrets that pose a security risk.
    
    ## Current State
-   - src/config.js contains exposed API keys
+   - app/src/config.js may contain exposed API keys (if demo snippet was added)
    - Database credentials are visible in code
    - GitHub token is committed to repository
    
@@ -265,127 +261,6 @@ This guide walks you through 10 key demonstrations of GitHub's AI-driven DevOps 
 
 ---
 
-## Running the Application Locally
-
-### Prerequisites:
-- Node.js v18+ (use `nvm use 24.4.0` or compatible version)
-- npm 11+
-- Git
-
-### Steps:
-1. Navigate to the app directory:
-   ```bash
-   cd app
-   ```
-
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-
-3. Start development server:
-   ```bash
-   npm run dev
-   ```
-
-4. Open browser to http://localhost:5173/
-
-5. Verify the app shows:
-   - A random picture (640x300)
-   - A random quote below the picture
-   - Updates every 5 seconds
-
-### Build for production:
-```bash
-npm run build
-```
-
----
-
-## Appendix: Example GitHub Actions Workflows
-
-### Example 1: Security Scanning Workflow
-Create `.github/workflows/security.yml`:
-```yaml
-name: Security Scanning
-
-on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
-
-jobs:
-  security:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      
-      - name: Run secret scanning
-        uses: trufflesecurity/trufflehog@main
-        with:
-          path: ./app
-          base: ${{ github.event.repository.default_branch }}
-          head: HEAD
-          
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '24.4.0'
-      
-      - name: Install dependencies
-        run: cd app && npm ci
-      
-      - name: Run linting
-        run: cd app && npm run lint
-        continue-on-error: true
-```
-
-### Example 2: CodeQL Analysis Workflow
-Create `.github/workflows/codeql.yml`:
-```yaml
-name: CodeQL
-
-on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
-
-jobs:
-  analyze:
-    name: Analyze
-    runs-on: ubuntu-latest
-    
-    strategy:
-      fail-fast: false
-      matrix:
-        language: [ 'javascript' ]
-    
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-    
-    - name: Initialize CodeQL
-      uses: github/codeql-action/init@v3
-      with:
-        languages: ${{ matrix.language }}
-    
-    - name: Set up Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '24.4.0'
-    
-    - name: Build
-      run: cd app && npm ci && npm run build
-      continue-on-error: true
-    
-    - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v3
-```
-
----
-
 ## Tips for Successful Demo
 
 1. **Practice beforehand**: Run through all steps at least once
@@ -423,7 +298,7 @@ After your demo:
 
 **Q: CodeQL isn't finding vulnerabilities**
 - A: Wait for the scan to complete (1-2 minutes)
-- A: Ensure the config.js file is present with hard-coded secrets
+- A: Add the temporary demo snippet from [appendix/vulnerability-demo-snippet.md](appendix/vulnerability-demo-snippet.md)
 - A: Check that CodeQL is enabled in repository settings
 
 **Q: Copilot suggestions aren't appearing**
@@ -448,6 +323,6 @@ After your demo:
 
 ---
 
-**Last Updated**: March 26, 2026
+**Last Updated**: March 30, 2026
 **App Version**: 1.0.0
 **Demo Difficulty**: Intermediate

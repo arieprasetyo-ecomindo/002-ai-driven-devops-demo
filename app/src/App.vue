@@ -1,5 +1,6 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
+import { getRandomQuoteId } from './utils/random'
 
 const pictureUrl = ref('')
 const quote = ref('')
@@ -16,7 +17,7 @@ const fetchPictureAndQuote = async () => {
     pictureUrl.value = picResponse.url
     
     // Fetch random quote from dummyjson.com
-    const randomNumber = Math.floor(Math.random() * 1000) + 1
+    const randomNumber = getRandomQuoteId(1000)
     const quoteResponse = await fetch(`https://dummyjson.com/quotes/${randomNumber}`)
     const quoteData = await quoteResponse.json()
     quote.value = quoteData.quote

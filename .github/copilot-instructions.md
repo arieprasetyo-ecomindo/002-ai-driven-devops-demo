@@ -5,6 +5,15 @@
 ## Demo Purpose
 This is a demonstration application for showing GitHub Copilot, GitHub Actions, CodeQL, and security features in an AI-driven DevOps workflow.
 
+## Environment Rule
+Before running Node.js or npm commands in this repository, run:
+
+```bash
+nvm use node
+```
+
+This ensures the latest Node version managed by `nvm` is active.
+
 ## Demo Application
 The application displays:
 - Random pictures from https://picsum.photos/640/300
@@ -348,15 +357,15 @@ const sanitized = DOMPurify.sanitize(userContent)
 ---
 
 ## Intentional Issues for Demo
-This codebase contains intentionally exposed security vulnerabilities to demonstrate:
+Use the manual snippet in `docs/appendix/vulnerability-demo-snippet.md` to demonstrate intentionally exposed security vulnerabilities:
 
 ### 1. Hard-coded Secrets
-- File: `src/config.js`
+- File (manual for demo): `app/src/config.js`
 - Contains: AWS keys, database passwords, GitHub tokens
 - Purpose: Demonstrate GitHub secret scanning and detection
 
 ### 2. SQL Injection Vulnerability
-- File: `src/config.js` - `queryDatabase()` function
+- File (manual for demo): `app/src/config.js` - `queryDatabase()` function
 - Issue: String concatenation without parameterized queries
 - Purpose: Demonstrate CodeQL analysis for security vulnerabilities
 
@@ -453,7 +462,7 @@ describe('App.vue', () => {
 ---
 
 ## Demo Workflow Steps
-See DEMO_GUIDE.md for detailed presenter instructions on how to demonstrate all features.
+See docs/DEMO_GUIDE.md for detailed presenter instructions on how to demonstrate all features.
 
 ## Key Technologies
 - Vue 3 with `<script setup>` syntax
