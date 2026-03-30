@@ -1,9 +1,35 @@
-# AI-Driven DevOps Demo Guide
+# AI-Driven DevOps Demo Runbook
 
-A comprehensive guide for presenters to demonstrate all features using this Vue.js + Vite demo application.
+A step-by-step presenter guide for demonstrating GitHub Copilot, Git hooks, GitHub Actions, and CodeQL using this Vue + Vite demo app.
 
-## Demo Overview
-This guide walks you through 10 key demonstrations of GitHub's AI-driven DevOps features using the included Vue.js application that displays random pictures and quotes. The app is intentionally created with security vulnerabilities to showcase GitHub's detection and remediation capabilities.
+## Demo Goal
+Show how AI assistance + local quality gates + cloud security checks work together in a realistic developer workflow.
+
+## Suggested Total Duration
+45 to 70 minutes (depending on CI queue time).
+
+## Pre-Demo Checklist (Do This First)
+1. Open a terminal at repository root.
+2. Run:
+   ```bash
+   nvm use node
+   ```
+3. Verify hook path:
+   ```bash
+   git config --get core.hooksPath
+   ```
+4. If empty, set it once:
+   ```bash
+   git config core.hooksPath .githooks
+   ```
+5. Install app dependencies (if not already installed):
+   ```bash
+   cd app && npm install
+   ```
+6. Optional quick confidence check:
+   ```bash
+   cd .. && .githooks/pre-push
+   ```
 
 ## Appendix Index
 - Native Git pre-push hook: [appendix/git-hooks-pre-push.md](appendix/git-hooks-pre-push.md)
@@ -15,314 +41,249 @@ This guide walks you through 10 key demonstrations of GitHub's AI-driven DevOps 
 
 ## Demo Item 1: Copilot Instructions Checklist
 
-**Objective**: Demonstrate the `.copilot-instructions.md` file and how it guides AI assistants.
+**Estimated Duration**: 4 to 6 minutes
 
-### Steps:
-1. Open `.copilot-instructions.md` in the `.github/` directory
-2. Show the instructions to AI assistants about the project
-3. Ask Copilot a question about the codebase (e.g., "What does this app do?")
-4. Highlight how Copilot uses these instructions for context
-5. Modify the instructions and ask another question to show how it affects responses
+**Objective**
+Show how project instructions shape Copilot responses.
 
-**Talking Points**:
-- `.copilot-instructions.md` provides context to AI assistants
-- Helps ensure consistent, project-aware responses
-- Can include coding standards, frameworks, and project-specific guidelines
-- Located at project root for easy discovery
+**Step-by-Step**
+1. Open `.github/copilot-instructions.md`.
+2. Explain project context rules (Vue app, security demo, nvm usage).
+3. Ask Copilot: "What does this app do?"
+4. Point out that Copilot answers with project-specific context.
+5. Optionally edit one instruction and ask again.
+
+**Success Check**
+Copilot response reflects repository-specific instructions.
 
 ---
 
-## Demo Item 2: Git Hooks
+## Demo Item 2: Git Hooks (Native, No Husky)
 
-**Objective**: Demonstrate native Git hooks that run before push while making a small UI change.
+**Estimated Duration**: 8 to 12 minutes
 
-### Steps:
-1. Show the native hook script in `.githooks/pre-push`
-2. Configure local hooks path once:
+**Objective**
+Show that local pre-push checks automatically block bad pushes.
+
+**Step-by-Step**
+1. Show `.githooks/pre-push`.
+2. Confirm hooks path once:
    ```bash
-   git config core.hooksPath .githooks
+   git config --get core.hooksPath
    ```
-3. Make a small UI change in `app/src/App.vue` (example: add a timer for next slide change)
-4. Stage and commit the UI change
-5. Confirm unit tests run before push:
+3. Make a small UI change in `app/src/App.vue` (example: add a timer for next slide change).
+4. Stage and commit the change.
+5. Push to trigger the hook:
    ```bash
    git push
    ```
-6. Demonstrate a failing test blocks push, then fix test and push again
-7. Refer to [appendix/git-hooks-pre-push.md](appendix/git-hooks-pre-push.md)
+6. (Optional) Introduce a failing test, push again, and show push is blocked.
+7. Fix test and push successfully.
 
-**Talking Points**:
-- Git hooks run automatically on developer machines
-- Catch issues early before code reaches the repository
-- Works naturally with everyday changes like a small UI update
-- Example here: pre-push runs all unit tests (`npm run test:unit`)
-- Saves time by preventing CI/CD failures
+**Success Check**
+Push is blocked when tests fail and allowed when tests pass.
+
+**Reference**
+[appendix/git-hooks-pre-push.md](appendix/git-hooks-pre-push.md)
 
 ---
 
 ## Demo Item 3: Committing Hard-Coded Keys (Security Anti-Pattern)
 
-**Objective**: Show the security vulnerability of hard-coded credentials.
+**Estimated Duration**: 6 to 8 minutes
 
-### Steps:
-1. Open [appendix/vulnerability-demo-snippet.md](appendix/vulnerability-demo-snippet.md)
-2. Copy the snippet into `app/src/config.js` manually during the demo
-3. Explain why hard-coded credentials are dangerous:
-   - Anyone with repository access can see credentials
-   - Credentials in git history are permanent and recoverable
-   - Risk of unauthorized access to services
-4. Commit intentionally in a demo branch only, then show how scanning tools detect it
+**Objective**
+Intentionally introduce vulnerable code in a demo branch to trigger security tooling.
 
-**Talking Points**:
-- Hard-coded secrets are a critical security risk
-- Once committed, they remain in git history even if deleted
-- GitHub Actions and CodeQL can flag these in subsequent demos
-- Best practice: Use environment variables and GitHub Secrets
+**Step-by-Step**
+1. Open [appendix/vulnerability-demo-snippet.md](appendix/vulnerability-demo-snippet.md).
+2. Create `app/src/config.js` and paste the snippet.
+3. Explain why this is dangerous:
+   - Exposed credentials in source code
+   - Secrets persist in Git history
+   - Potential unauthorized service access
+4. Commit and push this change only on demo branch.
+
+**Success Check**
+Vulnerable code is visible in branch history and ready for scanning demos.
 
 ---
 
 ## Demo Item 4: VSCode Commit Message Generation
 
-**Objective**: Show how GitHub Copilot generates commit messages automatically.
+**Estimated Duration**: 3 to 5 minutes
 
-### Steps:
-1. Reuse the latest change you just made (for example, the UI timer change from Demo Item 2)
-2. Go to VS Code Source Control (Ctrl+Shift+G / Cmd+Shift+G)
-3. Stage the changes
-4. Open the Commit Input box
-5. With Copilot extension enabled, use the "✨" button to generate a commit message
-6. Review and confirm the message
+**Objective**
+Show Copilot-generated commit messages based on staged changes.
 
-**Talking Points**:
-- Copilot understands your code changes and generates contextual commit messages
-- Uses component-level context (Vue setup, API calls, etc.)
-- Saves time and ensures consistency in commit messages
+**Step-by-Step**
+1. Reuse your latest staged change (UI timer or vulnerability snippet commit).
+2. Open Source Control (Cmd+Shift+G / Ctrl+Shift+G).
+3. Click the Copilot sparkle button in commit input.
+4. Review generated message.
+5. Commit using the generated message (or edited version).
+
+**Success Check**
+Commit message is contextual and descriptive without manual drafting.
 
 ---
 
-## Demo Item 5: Git Hooks & GitHub Actions
+## Demo Item 5: Git Hooks and GitHub Actions
 
-**Objective**: Compare local checks (git hooks) vs. cloud-based checks (GitHub Actions).
+**Estimated Duration**: 6 to 10 minutes
 
-### Steps:
-1. Show the git hook from Demo Item 2 (local machine)
-2. Create/show `.github/workflows/security.yml`
-3. Use this appendix as the template: [appendix/security-workflow.md](appendix/security-workflow.md)
-4. Explain the differences:
-   - Git Hooks: Run locally, fast feedback, developer-controlled
-   - GitHub Actions: Run on every push/PR, enforced checks, audit trail
-5. Commit changes and show the Actions running in GitHub
+**Objective**
+Compare local checks (hooks) versus cloud-enforced checks (Actions).
 
-**Talking Points**:
-- Defense in depth with multiple checkpoints
-- Git hooks catch issues early
-- GitHub Actions enforce rules at the repository level
-- Can't bypass GitHub Actions (unlike local hooks)
-- Creates audit trail for compliance
+**Step-by-Step**
+1. Recap local pre-push hook from Item 2.
+2. Show `.github/workflows/security.yml` (create if needed from appendix template).
+3. Explain differences:
+   - Git hooks: local, fast feedback, optional setup per clone
+   - GitHub Actions: server-side, auditable, enforced on push/PR
+4. Push and show GitHub Actions run.
+
+**Success Check**
+Audience understands defense-in-depth: local + cloud gates.
+
+**Reference**
+[appendix/security-workflow.md](appendix/security-workflow.md)
 
 ---
 
 ## Demo Item 6: CodeQL (JavaScript Quality)
 
-**Objective**: Demonstrate GitHub's CodeQL static analysis for security vulnerabilities.
+**Estimated Duration**: 10 to 15 minutes
 
-### Steps:
-1. Go to your GitHub repository Settings
-2. Navigate to Security → Code Security and Analysis
-3. Enable CodeQL (if not already enabled)
-4. Show that `.github/workflows/codeql.yml` is already present in the repository
-5. Push code changes to trigger CodeQL
-6. Wait for the scan to complete (usually 1-2 minutes)
-7. Go to Security tab → Code Scanning alerts
-8. Show the detected issues:
-   - Hard-coded secrets from the demo snippet, if intentionally added
-   - Potential SQL injection from the demo snippet function, if intentionally added
-   - Any other vulnerabilities CodeQL finds
-9. Workflow reference: [appendix/codeql-workflow.md](appendix/codeql-workflow.md)
+**Objective**
+Show semantic security analysis and real findings in GitHub Security tab.
 
-**Talking Points**:
-- CodeQL performs semantic code analysis
-- Identifies security vulnerabilities without executing code
-- Creates detailed alerts with severity levels
-- Provides remediation suggestions
-- Integrates with pull request reviews
+**Step-by-Step**
+1. In GitHub, go to Settings -> Security -> Code security and analysis.
+2. Ensure CodeQL is enabled.
+3. Show that `.github/workflows/codeql.yml` already exists.
+4. Push the vulnerable demo branch changes.
+5. Wait for CodeQL job completion.
+6. Open Security -> Code scanning alerts.
+7. Review findings (hard-coded secrets / SQL injection if snippet was added).
+
+**Success Check**
+At least one meaningful CodeQL/security alert is visible.
+
+**Reference**
+[appendix/codeql-workflow.md](appendix/codeql-workflow.md)
 
 ---
 
 ## Demo Item 7: PR Description
 
-**Objective**: Show how to Copilot can help write effective pull request descriptions.
+**Estimated Duration**: 4 to 6 minutes
 
-### Steps:
-1. Create a feature branch: `git checkout -b demo/fix-security-issues`
-2. Make improvements to the code (fix security issues found by CodeQL)
-3. Push the branch to GitHub
-4. Create a Pull Request 
-5. Ask Copilot in GitHub to write the PR description
+**Objective**
+Show AI-assisted PR documentation.
 
-**Talking Points**:
-- Clear descriptions help reviewers understand intent
-- Helps track what was changed and why
-- Creates better code review discussions
-- Documents decision-making for future reference
+**Step-by-Step**
+1. Create branch (if not already):
+   ```bash
+   git checkout -b demo/fix-security-issues
+   ```
+2. Make remediation changes.
+3. Push and open a pull request.
+4. Ask Copilot in GitHub to generate PR description.
+
+**Success Check**
+PR description clearly summarizes problem, changes, and impact.
 
 ---
 
 ## Demo Item 8: Copilot Reviewer
 
-**Objective**: Show how GitHub Copilot can review pull requests for code quality and security.
+**Estimated Duration**: 4 to 7 minutes
 
-### Steps:
-1. In the Pull Request created in Demo Item 7, add a comment
-2. Mention Copilot or use the Copilot review feature:
-   - Look for "Review with Copilot" button/option
-   - Or comment: `@copilot review`
-3. Copilot analyzes the PR and provides:
-   - Code quality suggestions
-   - Security issue identification
-   - Performance recommendations
-4. Review the feedback provided by Copilot
-5. Show how suggestions can be applied
+**Objective**
+Show AI-assisted pull request review.
 
-**Talking Points**:
-- Copilot acts as an additional reviewer
-- Catches common mistakes and anti-patterns
-- Provides suggestions based on best practices
-- Doesn't replace human review but augments it
-- Scalable way to maintain code quality
+**Step-by-Step**
+1. In PR, trigger Copilot review (`@copilot review` or review button).
+2. Walk through comments/suggestions.
+3. Apply one suggestion live if relevant.
+
+**Success Check**
+Copilot provides actionable review feedback on quality/security.
 
 ---
 
 ## Demo Item 9: GitHub Issues (Security Hardening)
 
-**Objective**: Demonstrate creating and tracking security improvements via GitHub Issues.
+**Estimated Duration**: 5 to 7 minutes
 
-### Steps:
-1. Go to your repository's Issues tab
-2. Create a new issue titled: "Security Hardening: Remove Hard-Coded Secrets"
-3. Add detailed description:
-   ```
-   ## Problem
-   The application contains hard-coded secrets that pose a security risk.
-   
-   ## Current State
-   - app/src/config.js may contain exposed API keys (if demo snippet was added)
-   - Database credentials are visible in code
-   - GitHub token is committed to repository
-   
-   ## Proposed Solution
-   1. Move all secrets to environment variables
-   2. Create .env.example with placeholder values
-   3. Update CI/CD to inject secrets at runtime
-   4. Rotate any exposed credentials
-   
-   ## Acceptance Criteria
-   - No secrets in public code
-   - CodeQL scan shows no credential exposure
-   - All tests pass
-   - Security team approves changes
-   ```
-4. Lock and reference the PR that fixes this issue
-5. Show how issues provide traceability for security work
+**Objective**
+Show traceability from security findings to tracked work.
 
-**Talking Points**:
-- GitHub Issues provide centralized tracking
-- Security improvements documented and traceable
-- Links between issues and code changes
-- Enables audit trails for compliance
-- Facilitates team coordination on security
+**Step-by-Step**
+1. Create issue: "Security Hardening: Remove Hard-Coded Secrets".
+2. Add problem statement, current state, proposed solution, acceptance criteria.
+3. Link issue to PR that fixes vulnerabilities.
+
+**Success Check**
+Issue, remediation PR, and security findings are connected.
 
 ---
 
-## Demo Item 10: Copilot Space (Optional Advanced Feature)
+## Demo Item 10: Copilot Space (Optional)
 
-**Objective**: Demonstrate Copilot Space for collaborative development with AI assistance.
+**Estimated Duration**: 8 to 12 minutes
 
-### Steps:
-1. Create a GitHub Codespace from the repository:
-   - Click Code → Codespaces → Create codespace on main
-2. Once the Codespace loads, open VS Code terminal
-3. Start the app: `npm run dev`
-4. Use Copilot chat in the Codespace:
-   - Press Ctrl+I or use the Copilot panel
-   - Ask questions like: "How does the quote fetching work?"
-   - Ask for improvements: "Add error handling to the quote fetch"
-   - Request explanations: "Explain the CSS grid layout"
-5. Copilot provides responses with full repository context
-6. Test implementing suggestions directly in the browser-based IDE
+**Objective**
+Show cloud dev environment + AI collaboration.
 
-**Talking Points**:
-- Codespacess provide cloud-based development environments
-- Pre-configured with all dependencies
-- Copilot has full context of the repository
-- Enables remote pair programming with AI
-- Works in browser - no local setup required
-- Great for onboarding and quick development
+**Step-by-Step**
+1. Create GitHub Codespace from main.
+2. Start app and open Copilot chat.
+3. Ask for explanation + improvement request.
+4. Apply one suggestion in the Codespace.
+
+**Success Check**
+Audience sees end-to-end cloud development with AI context.
 
 ---
 
-## Tips for Successful Demo
-
-1. **Practice beforehand**: Run through all steps at least once
-2. **Have backup slides**: In case CodeQL scans are slow
-3. **Explain the flow**: Walk through the architecture of what's happening
-4. **Show real issues**: Point out the intentional vulnerabilities and why they're bad
-5. **Engage audience**: Ask questions about what they see
-6. **Have a plan B**: If waiting for CI/CD, show recorded results
-7. **Emphasize benefits**: Save time, catch bugs, improves security
-8. **Remove secrets afterward**: Delete the exposed credentials after demo
-9. **Make it iterative**: Show how fixes lead to better security
-10. **Highlight collaboration**: Show how AI, automation, and humans work together
-
----
+## Tips for Smooth Delivery
+1. Keep a backup branch with known good state.
+2. Prepare one failing-test scenario in advance for Item 2.
+3. Expect CI delay; narrate what is happening while waiting.
+4. Keep vulnerable snippet only on demo branch.
+5. End with cleanup and credential-rotation reminder.
 
 ## Post-Demo Cleanup
+1. Remove `app/src/config.js` from branch history going forward.
+2. Revert demo-only insecure code.
+3. Confirm CodeQL findings are resolved in remediation branch.
+4. Close loop: issue, PR, and final status update.
 
-✅ **Do NOT commit the hard-coded secrets to main branch**
+## Troubleshooting
+**App does not start**
+- Run `nvm use node`
+- Run `cd app && npm install`
+- Check for port conflict on 5173
 
-After your demo:
-1. Clean up the demo branch
-2. Remove exposed credentials
-3. Ensure CodeQL has cleared the findings
-4. Document lessons learned
-5. Share demo insights with team
+**Hook does not run on push**
+- Check: `git config --get core.hooksPath`
+- Ensure output is `.githooks`
+- Ensure `.githooks/pre-push` is executable
 
----
-
-## Questions & Troubleshooting
-
-**Q: The app won't start**
-- A: Ensure Node.js 24.4.0+ is installed: `node --version`
-- A: Run `npm install` in the app directory
-- A: Check for port 5173 conflicts
-
-**Q: CodeQL isn't finding vulnerabilities**
-- A: Wait for the scan to complete (1-2 minutes)
-- A: Add the temporary demo snippet from [appendix/vulnerability-demo-snippet.md](appendix/vulnerability-demo-snippet.md)
-- A: Check that CodeQL is enabled in repository settings
-
-**Q: Copilot suggestions aren't appearing**
-- A: Ensure Copilot extension is installed
-- A: Check that you have Copilot subscription active
-- A: Try restarting VS Code
-
-**Q: GitHub Actions aren't running**
-- A: Ensure workflow files are in `.github/workflows/`
-- A: Check that workflows are enabled in repository settings
-- A: Push to a branch and create a PR to trigger workflows
-
----
+**CodeQL not showing findings yet**
+- Wait for workflow completion
+- Confirm vulnerable snippet exists in branch
+- Verify CodeQL enabled in repo settings
 
 ## Resources
-
 - [GitHub Copilot Documentation](https://docs.github.com/en/copilot)
 - [GitHub Actions Documentation](https://docs.github.com/en/actions)
 - [CodeQL Documentation](https://codeql.github.com)
 - [Vue.js 3 Documentation](https://vuejs.org)
 - [Vite Documentation](https://vitejs.dev)
 
----
-
-**Last Updated**: March 30, 2026
-**App Version**: 1.0.0
+**Last Updated**: March 30, 2026  
+**App Version**: 1.0.0  
 **Demo Difficulty**: Intermediate
