@@ -58,7 +58,7 @@ Copilot response reflects repository-specific instructions.
 
 ---
 
-## Demo Item 2: Git Hooks (Native, No Husky)
+## Demo Item 2: Git Hooks (Native)
 
 **Estimated Duration**: 8 to 12 minutes
 
@@ -162,10 +162,14 @@ Show semantic security analysis and real findings in GitHub Security tab.
 1. In GitHub, go to Settings -> Security -> Code security and analysis.
 2. Ensure CodeQL is enabled.
 3. Show that `.github/workflows/codeql.yml` already exists.
-4. Push the vulnerable demo branch changes.
-5. Wait for CodeQL job completion.
-6. Open Security -> Code scanning alerts.
-7. Review findings (hard-coded secrets / SQL injection if snippet was added).
+4. Briefly show workflow permissions in `.github/workflows/codeql.yml`:
+   - `security-events: write`
+   - `contents: read`
+   - `actions: read`
+5. Push the vulnerable demo branch changes.
+6. Wait for CodeQL job completion.
+7. Open Security -> Code scanning alerts.
+8. Review findings (hard-coded secrets / SQL injection if snippet was added).
 
 **Success Check**
 At least one meaningful CodeQL/security alert is visible.
@@ -276,6 +280,11 @@ Audience sees end-to-end cloud development with AI context.
 - Wait for workflow completion
 - Confirm vulnerable snippet exists in branch
 - Verify CodeQL enabled in repo settings
+
+**CodeQL permission error: Resource not accessible by integration**
+- Usually happens on pull requests from forks (restricted token permissions)
+- Demo from a same-repo branch (recommended)
+- Ensure `.github/workflows/codeql.yml` includes `security-events: write`
 
 ## Resources
 - [GitHub Copilot Documentation](https://docs.github.com/en/copilot)
