@@ -9,6 +9,8 @@ Show how AI assistance + local quality gates + cloud security checks work togeth
 45 to 70 minutes (depending on CI queue time).
 
 ## Pre-Demo Checklist (Do This First)
+Always create a new branch. Do not use `main`.
+
 1. Open a terminal at repository root.
 2. Run:
    ```bash
@@ -46,12 +48,18 @@ Show how AI assistance + local quality gates + cloud security checks work togeth
 **Objective**
 Show how project instructions shape Copilot responses.
 
-**Step-by-Step**
-1. Open `.github/copilot-instructions.md`.
-2. Explain project context rules (Vue app, security demo, nvm usage).
-3. Ask Copilot: "What does this app do?"
-4. Point out that Copilot answers with project-specific context.
-5. Optionally edit one instruction and ask again.
+**Action**
+Add these new content in copilot-instructions.md:
+
+```
+---
+
+## General best practices
+- always add comments to explain functions and classes
+- always add unit tests for new code
+- use descriptive variable and function names
+- udpate README.md with latest changes
+```
 
 **Success Check**
 Copilot response reflects repository-specific instructions.
@@ -71,7 +79,7 @@ Show that local pre-push checks automatically block bad pushes.
    ```bash
    git config --get core.hooksPath
    ```
-3. Make a small UI change in `app/src/App.vue` (example: add a timer for next slide change).
+3. Ask Copilot to make a new feature: `add a timer in the UI to indicate next slide change`.
 4. Stage and commit the change.
 5. Push to trigger the hook:
    ```bash
@@ -158,6 +166,8 @@ Audience understands defense-in-depth: local + cloud gates.
 **Objective**
 Show semantic security analysis and real findings in GitHub Security tab.
 
+This CodeQL workflow runs on pushes and pull requests to main, scans JavaScript code, and uploads results to GitHub Code scanning alerts. It uses least-privilege permissions, skips forked pull request heads for safety, checks out code, initializes CodeQL, sets up Node.js, attempts a build for better analysis context, then performs the CodeQL analysis.
+
 **Step-by-Step**
 1. In GitHub, go to Settings -> Security -> Code security and analysis.
 2. Ensure CodeQL is enabled.
@@ -239,16 +249,17 @@ Issue, remediation PR, and security findings are connected.
 **Estimated Duration**: 8 to 12 minutes
 
 **Objective**
-Show cloud dev environment + AI collaboration.
+Show how Copilot Space captures project context and helps generate aligned implementation guidance.
 
 **Step-by-Step**
-1. Create GitHub Codespace from main.
-2. Start app and open Copilot chat.
-3. Ask for explanation + improvement request.
-4. Apply one suggestion in the Codespace.
+1. Open GitHub Copilot Space and create a new space for this repository.
+2. Add relevant context (README, demo guide, security workflow, and open issues/PRs).
+3. Ask the space to summarize current risks and propose a security hardening plan.
+4. Ask the space to generate implementation tasks and a draft PR description.
+5. Use one generated task in your local branch and show how space context keeps answers consistent.
 
 **Success Check**
-Audience sees end-to-end cloud development with AI context.
+Audience sees that Copilot Space provides reusable, project-aware guidance that improves consistency across planning and implementation.
 
 ---
 
