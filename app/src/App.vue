@@ -1,49 +1,8 @@
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
-import { getRandomQuoteId } from './utils/random'
+import { useSlideShow } from './composables/useSlideShow'
 
-const pictureUrl = ref('')
-const quote = ref('')
-const author = ref('')
-const loading = ref(true)
-let intervalId = null
-
-const fetchPictureAndQuote = async () => {
-  try {
-    loading.value = true
-    
-    // Fetch picture from picsum.photos
-    const picResponse = await fetch('https://picsum.photos/640/300')
-    pictureUrl.value = picResponse.url
-    
-    // Fetch random quote from dummyjson.com
-    const randomNumber = getRandomQuoteId(1000)
-    const quoteResponse = await fetch(`https://dummyjson.com/quotes/${randomNumber}`)
-    const quoteData = await quoteResponse.json()
-    quote.value = quoteData.quote
-    author.value = quoteData.author
-    
-    loading.value = false
-  } catch (error) {
-    console.error('Error fetching data:', error)
-    loading.value = false
-  }
-}
-
-onMounted(() => {
-  // Fetch immediately on mount
-  fetchPictureAndQuote()
-  
-  // Set up interval to fetch every 5 seconds
-  intervalId = setInterval(fetchPictureAndQuote, 15000)
-})
-
-onUnmounted(() => {
-  // Clear interval when component unmounts
-  if (intervalId) {
-    clearInterval(intervalId)
-  }
-})
+// All slide-show logic lives in the composable
+const { pictureUrl, quote, author, loading, countdown, progressPercent } = useSlideShow()
 </script>
 
 <template>
@@ -58,6 +17,14 @@ onUnmounted(() => {
       <div class="quote-section">
         <p class="quote-text">"{{ quote }}"</p>
         <p class="quote-author">— {{ author }}</p>
+      </div>
+
+      <!-- Countdown timer indicating next slide change -->
+      <div class="timer">
+        <div class="timer-bar">
+          <div class="timer-bar-fill" :style="{ width: progressPercent + '%' }"></div>
+        </div>
+        <p class="timer-label">Next slide in {{ countdown }}s</p>
       </div>
     </div>
     
@@ -126,6 +93,32 @@ h1 {
   color: #666;
   margin: 0;
   font-weight: 500;
+}
+
+.timer {
+  margin-top: 24px;
+}
+
+.timer-bar {
+  width: 100%;
+  height: 6px;
+  background: #e0e0e0;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.timer-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #667eea, #764ba2);
+  border-radius: 3px;
+  transition: width 0.9s linear;
+}
+
+.timer-label {
+  text-align: center;
+  font-size: 0.8rem;
+  color: #999;
+  margin: 6px 0 0 0;
 }
 
 .loading {
