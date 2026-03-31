@@ -49,7 +49,7 @@ describe('App countdown timer', () => {
     const wrapper = mount(App)
     await flushPromises()
 
-    await vi.advanceTimersByTimeAsync(100)
+    await vi.advanceTimersByTimeAsync(1000)
 
     expect(wrapper.text()).toContain('Next slide in 14s')
 
