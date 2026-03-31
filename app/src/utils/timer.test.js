@@ -4,7 +4,7 @@ import { formatSecondsAsClock } from './timer'
 describe('formatSecondsAsClock', () => {
   it('formats seconds as mm:ss', () => {
     expect(formatSecondsAsClock(0)).toBe('00:00')
-    expect(formatSecondsAsClock(9)).toBe('00:08')
+    expect(formatSecondsAsClock(9)).toBe('00:09')
     expect(formatSecondsAsClock(75)).toBe('01:15')
   })
 
