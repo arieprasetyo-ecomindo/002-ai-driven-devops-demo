@@ -42,7 +42,7 @@ describe('fetchQuote', () => {
 
     // Assert
     expect(mockFetch).toHaveBeenCalledWith('https://dummyjson.com/quotes/7')
-    expect(result).toEqual({ quote: 'Be the change.', author: 'Gandh' })
+    expect(result).toEqual({ quote: 'Be the change.', author: 'Gandhi' })
   })
 
   it('returns only quote and author, ignoring extra API fields', async () => {
