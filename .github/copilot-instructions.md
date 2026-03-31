@@ -22,6 +22,14 @@ The application displays:
 
 ---
 
+## General best practices
+- always add comments to explain functions and classes
+- always add unit tests for new code
+- use descriptive variable and function names
+- update README.md with latest changes
+
+---
+
 ## Vue 3 Best Practices
 
 ### Code Style & Structure

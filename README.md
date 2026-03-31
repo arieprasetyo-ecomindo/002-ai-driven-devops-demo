@@ -25,7 +25,8 @@ AI-driven DevOps demo
 5. Verify the app shows:
 	- A random picture (640x300)
 	- A random quote below the picture
-	- Updates every 5 seconds
+	- A countdown timer showing when the next slide change will happen
+	- Updates every 15 seconds
 
 ### Build for Production
 ```bash

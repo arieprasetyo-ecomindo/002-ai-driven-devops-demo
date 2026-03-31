@@ -1,12 +1,30 @@
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { computed, ref, onMounted, onUnmounted } from 'vue'
 import { getRandomQuoteId } from './utils/random'
+import { formatSecondsAsClock } from './utils/timer'
 
 const pictureUrl = ref('')
 const quote = ref('')
 const author = ref('')
 const loading = ref(true)
-let intervalId = null
+const CHANGE_INTERVAL_MS = 15000
+const nextChangeTimestamp = ref(0)
+const secondsUntilNextChange = ref(Math.floor(CHANGE_INTERVAL_MS / 1000))
+
+const countdownDisplay = computed(() => formatSecondsAsClock(secondsUntilNextChange.value))
+
+let slideIntervalId = null
+let countdownIntervalId = null
+
+const updateCountdown = () => {
+  const millisecondsRemaining = nextChangeTimestamp.value - Date.now()
+  secondsUntilNextChange.value = Math.max(0, Math.ceil(millisecondsRemaining / 1000))
+}
+
+const scheduleNextSlideChange = () => {
+  nextChangeTimestamp.value = Date.now() + CHANGE_INTERVAL_MS
+  updateCountdown()
+}
 
 const fetchPictureAndQuote = async () => {
   try {
@@ -30,18 +48,28 @@ const fetchPictureAndQuote = async () => {
   }
 }
 
+const handleSlideChange = () => {
+  scheduleNextSlideChange()
+  fetchPictureAndQuote()
+}
+
 onMounted(() => {
   // Fetch immediately on mount
   fetchPictureAndQuote()
+  scheduleNextSlideChange()
   
-  // Set up interval to fetch every 5 seconds
-  intervalId = setInterval(fetchPictureAndQuote, 15000)
+  // Set up interval to fetch every 15 seconds
+  slideIntervalId = setInterval(handleSlideChange, CHANGE_INTERVAL_MS)
+  countdownIntervalId = setInterval(updateCountdown, 1000)
 })
 
 onUnmounted(() => {
-  // Clear interval when component unmounts
-  if (intervalId) {
-    clearInterval(intervalId)
+  // Clear intervals when component unmounts
+  if (slideIntervalId) {
+    clearInterval(slideIntervalId)
+  }
+  if (countdownIntervalId) {
+    clearInterval(countdownIntervalId)
   }
 })
 </script>
@@ -49,6 +77,8 @@ onUnmounted(() => {
 <template>
   <div class="container">
     <h1>Random Picture & Quote</h1>
+
+    <p class="timer-status">Next slide in {{ countdownDisplay }}</p>
     
     <div class="content" v-if="!loading">
       <div class="picture-wrapper">
@@ -93,6 +123,16 @@ h1 {
   max-width: 700px;
   width: 100%;
   animation: fadeIn 0.5s ease-in;
+}
+
+.timer-status {
+  color: #f8f7ff;
+  font-size: 1rem;
+  margin: 0 0 20px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 700;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 .picture-wrapper {
