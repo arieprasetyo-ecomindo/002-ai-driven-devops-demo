@@ -32,6 +32,7 @@ The application displays:
 - Keep components small and focused (single responsibility principle)
 - Name components descriptively (e.g., `PictureQuoteCard.vue` instead of `Card.vue`)
 - Use PascalCase for component names in templates
+- Always add inline documentation for complex logic or non-obvious code using JSDoc comments
 
 **❌ DON'T:**
 - Mix Options API and Composition API in the same codebase

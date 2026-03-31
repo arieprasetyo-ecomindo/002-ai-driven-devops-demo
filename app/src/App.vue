@@ -2,11 +2,26 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import { getRandomQuoteId } from './utils/random'
 
+const SLIDE_INTERVAL_MS = 15000
+
 const pictureUrl = ref('')
 const quote = ref('')
 const author = ref('')
 const loading = ref(true)
-let intervalId = null
+const countdownSeconds = ref(Math.floor(SLIDE_INTERVAL_MS / 1000))
+let slideIntervalId = null
+let countdownIntervalId = null
+let nextSlideChangeAt = 0
+
+const updateCountdown = () => {
+  const msRemaining = Math.max(0, nextSlideChangeAt - Date.now())
+  countdownSeconds.value = Math.ceil(msRemaining / 1000)
+}
+
+const resetCountdown = () => {
+  nextSlideChangeAt = Date.now() + SLIDE_INTERVAL_MS
+  updateCountdown()
+}
 
 const fetchPictureAndQuote = async () => {
   try {
@@ -33,15 +48,28 @@ const fetchPictureAndQuote = async () => {
 onMounted(() => {
   // Fetch immediately on mount
   fetchPictureAndQuote()
-  
-  // Set up interval to fetch every 5 seconds
-  intervalId = setInterval(fetchPictureAndQuote, 15000)
+
+  // Keep countdown in sync with the next scheduled slide change.
+  resetCountdown()
+
+  // Set up interval to fetch on each slide change.
+  slideIntervalId = setInterval(() => {
+    fetchPictureAndQuote()
+    resetCountdown()
+  }, SLIDE_INTERVAL_MS)
+
+  // Update countdown text regularly for smoother UX.
+  countdownIntervalId = setInterval(updateCountdown, 250)
 })
 
 onUnmounted(() => {
-  // Clear interval when component unmounts
-  if (intervalId) {
-    clearInterval(intervalId)
+  // Clear intervals when component unmounts
+  if (slideIntervalId) {
+    clearInterval(slideIntervalId)
+  }
+
+  if (countdownIntervalId) {
+    clearInterval(countdownIntervalId)
   }
 })
 </script>
@@ -49,6 +77,8 @@ onUnmounted(() => {
 <template>
   <div class="container">
     <h1>Random Picture & Quote</h1>
+
+    <p class="countdown">Next slide in {{ countdownSeconds }}s</p>
     
     <div class="content" v-if="!loading">
       <div class="picture-wrapper">
@@ -83,6 +113,17 @@ h1 {
   margin-bottom: 40px;
   font-size: 2.5rem;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.countdown {
+  margin: 0 0 20px 0;
+  padding: 8px 16px;
+  border-radius: 999px;
+  color: white;
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  font-weight: 600;
+  letter-spacing: 0.02em;
 }
 
 .content {
